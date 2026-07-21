@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-white dark:bg-sidebar text-slate-800 dark:text-slate-100 antialiased;
+  }
+}
+
+/* Custom Scrollbars for dashboard feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Glassmorphism styling helpers */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(51, 65, 85, 0.4);
+}
+
+/* Print Overrides */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Hide elements that are not useful in static reports */
+  .no-print,
+  nav,
+  aside,
+  header,
+  .uploader-section,
+  button,
+  .print-action-btn,
+  .filter-bar {
+    display: none !important;
+  }
+
+  /* Make main container full width without sidebar padding */
+  main,
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    position: static !important;
+  }
+
+  /* Ensure cards look clean on paper (no shadows, solid thin borders) */
+  .card, 
+  .glass-card, 
+  .kpi-card {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
+    page-break-inside: avoid;
+    margin-bottom: 15px !important;
+  }
+
+  /* Grid layout adjustments for printing (2 cols instead of 4, or linear layout) */
+  .print-grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .print-grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Force table formatting for reports */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* Add page headings */
+  .print-header {
+    display: block !important;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #0038A8;
+    padding-bottom: 10px;
+  }
+
+  /* Prevent chart elements from clipping */
+  .chart-container {
+    page-break-inside: avoid !important;
+    height: 350px !important;
+    max-height: 350px !important;
+    width: 100% !important;
+  }
+}
+
+/* Hidden by default, visible during print */
+.print-header {
+  display: none;
+}
+
+/* Semantic Theme Classes */
+
+/* 1. Main Canvas backgrounds */
+.app-bg {
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.dark .app-bg {
+  background-color: #0B192C;
+  color: #f1f5f9;
+}
+
+/* 2. Header component */
+.header-bg {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.dark .header-bg {
+  background-color: #0F172A;
+  border-color: #1e293b;
+  color: #ffffff;
+}
+
+/* 3. Standard visual cards (Charts, Checklist container) */
+.card-bg {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.dark .card-bg {
+  background-color: #0F172A;
+  border-color: #1e293b;
+}
+
+/* 4. Tables and header rows */
+.table-header-bg {
+  background-color: #f8fafc;
+  color: #64748b;
+  border-color: #f1f5f9;
+}
+.dark .table-header-bg {
+  background-color: rgba(30, 41, 59, 0.5);
+  color: #94a3b8;
+  border-color: #1e293b;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(248, 250, 252, 0.5);
+}
+.dark .table-row-hover:hover {
+  background-color: rgba(30, 41, 59, 0.4);
+}
+
+.table-divide > :not([hidden]) ~ :not([hidden]) {
+  border-color: #f1f5f9;
+}
+.dark .table-divide > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b;
+}
+
+/* 5. Inputs & Selectors */
+.input-bg {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+.dark .input-bg {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+/* 6. Pagination & buttons */
+.btn-secondary {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+.dark .btn-secondary {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+.btn-secondary:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+.dark .btn-secondary:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+.page-btn-inactive {
+  color: #475569;
+}
+.dark .page-btn-inactive {
+  color: #94a3b8;
+}
+.page-btn-inactive:hover {
+  background-color: #f8fafc;
+}
+.dark .page-btn-inactive:hover {
+  background-color: #1e293b;
+}
