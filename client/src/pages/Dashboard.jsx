@@ -9,7 +9,7 @@ import { Target, TrendingUp, FileSpreadsheet, Activity, Clock } from 'lucide-rea
 
 export default function Dashboard() {
   const { user } = useAuthStore();
-  
+
   const [stats, setStats] = useState({
     totalAccomplishments: 0,
     byCategory: [],
@@ -19,9 +19,11 @@ export default function Dashboard() {
     previousYearTotal: 0,
     reports: [],
     indicators: [],
-    category7Activities: []
+    category7Activities: [],
+    topIndicators: [],
+    totalTarget: 0
   });
-  
+
   const [regions, setRegions] = useState([]);
   const [adminSelectedRegion, setAdminSelectedRegion] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
@@ -37,22 +39,22 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-      
+
       let fetchRegionId = null;
       if (!isAdmin) {
         fetchRegionId = user?.regionId?._id || user?.regionId || user?.region?._id || user?.region;
       } else if (adminSelectedRegion !== 'All') {
         fetchRegionId = adminSelectedRegion;
       }
-      
-      const url = fetchRegionId 
+
+      const url = fetchRegionId
         ? `/accomplishments?regionId=${fetchRegionId}&reportingYear=${currentYear}`
         : `/accomplishments?reportingYear=${currentYear}`;
-        
+
       const summaryUrl = fetchRegionId
         ? `/accomplishments/summary?regionId=${fetchRegionId}&reportingYear=${currentYear - 1}`
         : `/accomplishments/summary?reportingYear=${currentYear - 1}`;
-        
+
       const reportsUrl = `/reports?reportingYear=${currentYear}`;
 
       const [accRes, catsRes, regionsRes, summaryRes, reportsRes, indsRes] = await Promise.all([
@@ -70,7 +72,7 @@ export default function Dashboard() {
       const previousYearTotal = summaryRes.data.totalAccomplishments || 0;
       const reports = reportsRes.data;
       const indicators = indsRes.data;
-      
+
       if (isAdmin && regions.length === 0) {
         setRegions(allRegions);
       }
@@ -78,10 +80,13 @@ export default function Dashboard() {
       const totalAccomplishments = data.reduce((sum, item) => sum + (item.actual || 0), 0);
 
       const catMap = {};
-      categories.forEach(c => catMap[c._id] = { name: c.categoryName, value: 0 });
+      categories.forEach(c => catMap[String(c._id)] = { name: c.categoryName, value: 0 });
       data.forEach(item => {
-        const catId = item.categoryId || item.indicatorId?.categoryId;
-        if (catId && catMap[catId]) catMap[catId].value += (item.actual || 0);
+        let catId = item.categoryId?._id || item.categoryId || item.indicatorId?.categoryId?._id || item.indicatorId?.categoryId;
+        if (catId) {
+          catId = String(catId);
+          if (catMap[catId]) catMap[catId].value += (item.actual || 0);
+        }
       });
       const byCategory = Object.values(catMap).filter(c => c.value > 0);
 
@@ -95,7 +100,7 @@ export default function Dashboard() {
         } else if (item.monthIndex !== undefined && item.monthIndex !== null) {
           mIdx = item.monthIndex;
         }
-        
+
         if (mIdx !== null && monthMap[mIdx]) {
           monthMap[mIdx].Accomplishments += (item.actual || 0);
         }
@@ -105,7 +110,7 @@ export default function Dashboard() {
       const regionMap = {};
       allRegions.forEach(r => regionMap[r._id] = { name: r.shortName || r.regionName, value: 0 });
       data.forEach(item => {
-        const rId = item.regionId;
+        const rId = item.regionId?._id || item.regionId;
         if (rId && regionMap[rId]) regionMap[rId].value += (item.actual || 0);
       });
       const byRegion = Object.values(regionMap)
@@ -113,7 +118,8 @@ export default function Dashboard() {
         .sort((a, b) => b.value - a.value);
 
       const recentSubmissions = data.slice(0, 10).map(item => {
-        const reg = allRegions.find(r => r._id === item.regionId);
+        const rId = item.regionId?._id || item.regionId;
+        const reg = allRegions.find(r => r._id === rId);
         const displayName = item.reportType === 'activity' ? item.activityTitle : item.indicatorId?.indicatorName;
         return {
           ...item,
@@ -127,10 +133,13 @@ export default function Dashboard() {
         .filter(item => item.reportType === 'activity')
         .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
         .slice(0, 5)
-        .map(item => ({
-          ...item,
-          regionName: allRegions.find(r => r._id === item.regionId)?.shortName || 'Unknown'
-        }));
+        .map(item => {
+          const rId = item.regionId?._id || item.regionId;
+          return {
+            ...item,
+            regionName: allRegions.find(r => r._id === rId)?.shortName || 'Unknown'
+          };
+        });
 
       const indMap = {};
       indicators.forEach(i => indMap[i._id] = { name: i.indicatorName, value: 0 });
@@ -181,16 +190,16 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-2xl bg-gov-blue-light/30 border-gov-blue/20 flex-1 w-full">
           <h2 className="text-2xl font-black text-gov-blue">Welcome back, {user?.firstName}! 👋</h2>
           <p className="text-slate-600 mt-1 font-medium">
-            {isAdmin 
-              ? 'Here is an overview of the national accomplishment reports.' 
+            {isAdmin
+              ? 'Here is an overview of the national accomplishment reports.'
               : `Here is the performance overview for ${user?.region?.regionName || 'your region'}.`}
           </p>
         </div>
-        
+
         {isAdmin && (
           <div className="glass-card p-4 rounded-2xl w-full md:w-auto shadow-sm">
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">View Data For:</label>
-            <select 
+            <select
               value={adminSelectedRegion}
               onChange={(e) => setAdminSelectedRegion(e.target.value)}
               className="border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-bold focus:ring-2 focus:ring-gov-blue outline-none appearance-none bg-slate-50 text-slate-800 min-w-[200px]"
@@ -234,8 +243,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-            <div 
-              className="bg-purple-600 h-2.5 rounded-full" 
+            <div
+              className="bg-purple-600 h-2.5 rounded-full"
               style={{ width: `${Math.min((stats.totalAccomplishments / (stats.totalTarget || 1)) * 100, 100)}%` }}
             ></div>
           </div>
@@ -255,7 +264,7 @@ export default function Dashboard() {
 
       {isAdmin && adminSelectedRegion === 'All' && (
         <div className="glass-card p-6 rounded-2xl hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md">
-          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><FileSpreadsheet size={16} className="text-gov-blue"/> Regional Submission Compliance (Q1-Q4)</h3>
+          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><FileSpreadsheet size={16} className="text-gov-blue" /> Regional Submission Compliance (Q1-Q4)</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -285,24 +294,24 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="glass-card p-6 rounded-2xl hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md relative">
           {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-2xl"></div>}
-          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Activity size={16} className="text-gov-blue"/> Accomplishments Trend ({currentYear})</h3>
+          <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Activity size={16} className="text-gov-blue" /> Accomplishments Trend ({currentYear})</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.trend} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                 <defs>
                   <linearGradient id="colorAcc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0038A8" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#0038A8" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#0038A8" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#0038A8" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
                   itemStyle={{ color: '#0038A8', fontWeight: 'bold' }}
                 />
@@ -315,15 +324,15 @@ export default function Dashboard() {
         {isAdmin && adminSelectedRegion === 'All' ? (
           <div className="glass-card p-6 rounded-2xl hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md relative">
             {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-2xl"></div>}
-            <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Target size={16} className="text-gov-gold-dark"/> Top 5 Performing Indicators</h3>
+            <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Target size={16} className="text-gov-gold-dark" /> Top 5 Performing Indicators</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.topIndicators} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                  <XAxis type="number" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                  <YAxis dataKey="name" type="category" width={180} axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 11, fontWeight: 600}} />
-                  <Tooltip 
-                    cursor={{fill: '#f8fafc'}}
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <YAxis dataKey="name" type="category" width={180} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }} />
+                  <Tooltip
+                    cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
                   />
                   <Bar dataKey="value" name="Accomplishments" radius={[0, 4, 4, 0]}>
@@ -338,15 +347,15 @@ export default function Dashboard() {
         ) : (
           <div className="glass-card p-6 rounded-2xl hover:-translate-y-0.5 transition-all duration-300 hover:shadow-md relative">
             {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-2xl"></div>}
-            <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Target size={16} className="text-gov-gold-dark"/> Accomplishments by Category</h3>
+            <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2"><Target size={16} className="text-gov-gold-dark" /> Accomplishments by Category</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.byCategory} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                  <XAxis type="number" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                  <YAxis dataKey="name" type="category" width={150} axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 11, fontWeight: 600}} />
-                  <Tooltip 
-                    cursor={{fill: '#f8fafc'}}
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <YAxis dataKey="name" type="category" width={150} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }} />
+                  <Tooltip
+                    cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
                   />
                   <Bar dataKey="value" name="Accomplishments" radius={[0, 4, 4, 0]}>
@@ -365,8 +374,8 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <div className="glass-card p-6 rounded-2xl relative flex flex-col">
           {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-2xl"></div>}
-          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Activity size={16} className="text-gov-gold-dark"/> Category 7: Other Activities Highlights</h3>
-          
+          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Activity size={16} className="text-gov-gold-dark" /> Category 7: Other Activities Highlights</h3>
+
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 max-h-[300px]">
             {stats.category7Activities.length > 0 ? (
               stats.category7Activities.map((act, idx) => (
@@ -395,8 +404,8 @@ export default function Dashboard() {
 
         <div className="glass-card p-6 rounded-2xl relative flex flex-col">
           {isLoading && <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 rounded-2xl"></div>}
-          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Clock size={16} className="text-purple-600"/> Recent Submissions</h3>
-          
+          <h3 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><Clock size={16} className="text-purple-600" /> Recent Submissions</h3>
+
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 max-h-[300px]">
             {stats.recentSubmissions.length > 0 ? (
               stats.recentSubmissions.map((sub, idx) => (

@@ -3,7 +3,14 @@ const mongoose = require('mongoose');
 const accomplishmentEntrySchema = new mongoose.Schema({
   regionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Region', required: true },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
-  indicatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Indicator', default: null },
+  indicatorId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Indicator', 
+    default: null,
+    required: function() {
+      return this.reportType === 'weekly';
+    }
+  },
   reportingPeriodId: { type: mongoose.Schema.Types.ObjectId, ref: 'ReportingPeriod' },
   
   reportType: { type: String, enum: ['weekly', 'activity'], required: true },

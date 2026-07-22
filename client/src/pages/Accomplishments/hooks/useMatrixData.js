@@ -35,11 +35,12 @@ export function useMatrixData(user, selectedYear, selectedQuarter) {
       accRes.data.forEach(acc => {
         if (acc.reportType === 'activity') {
           acts.push(acc);
-        } else {
-          if (!accMap[acc.indicatorId._id]) {
-            accMap[acc.indicatorId._id] = {};
+        } else if (acc.indicatorId) {
+          const indId = acc.indicatorId._id || acc.indicatorId;
+          if (!accMap[indId]) {
+            accMap[indId] = {};
           }
-          accMap[acc.indicatorId._id][`${acc.monthIndex}-${acc.weekNumber}`] = acc.actual;
+          accMap[indId][`${acc.monthIndex}-${acc.weekNumber}`] = acc.actual;
         }
       });
       setAccomplishments(accMap);

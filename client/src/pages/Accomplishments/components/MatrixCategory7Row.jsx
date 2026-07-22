@@ -57,20 +57,18 @@ export default function MatrixCategory7Row({ cat, catColors, activities, flatWee
                   
                   flatWeeks.forEach((w, wIdx) => {
                     if (w.monthIndex === group.monthIndex) {
-                      if (!isFirstInMonth) {
-                        return; // Cell merged from row above
-                      }
-                      
                       if (!monthCellRendered) {
                         monthCellRendered = true;
                         renderedCells.push(
                           <td 
                             key={`act-span-${wIdx}`}
-                            rowSpan={rowSpan}
                             colSpan={targetMonthCols}
-                            className="bg-blue-50/30 border-r border-b border-slate-200 p-2 align-top"
+                            className="bg-blue-50/30 border-r border-b border-slate-200 p-2 align-middle text-center"
                           >
-                            <div className="w-full h-1 bg-blue-400 rounded-full mb-1 opacity-70"></div>
+                            <div className="flex flex-col items-center justify-center h-full">
+                              <span className="font-bold text-blue-700 text-xs">{act.actual || 0}</span>
+                              <div className="w-full h-1.5 bg-blue-400 rounded-full mt-1 opacity-70"></div>
+                            </div>
                           </td>
                         );
                       }
