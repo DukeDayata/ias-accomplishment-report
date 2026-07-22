@@ -18,7 +18,7 @@ export default function UserManagement() {
     lastName: '',
     email: '',
     password: '',
-    role: 'Regional Encoder or Project Technical Staff',
+    role: 'Project Technical Staff',
     regionId: ''
   });
 
@@ -30,7 +30,7 @@ export default function UserManagement() {
     'IAS Monitoring Officer',
     'IAS Management or Director',
     'Regional Administrator or IZN Focal Person',
-    'Regional Encoder or Project Technical Staff',
+    'Project Technical Staff',
     'Regional Director'
   ];
 
@@ -80,7 +80,7 @@ export default function UserManagement() {
         lastName: '',
         email: '',
         password: '',
-        role: 'Regional Encoder or Project Technical Staff',
+        role: 'Project Technical Staff',
         regionId: ''
       });
     }

@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
       'IAS Monitoring Officer',
       'IAS Management or Director',
       'Regional Administrator or IZN Focal Person',
-      'Regional Encoder or Project Technical Staff',
+      'Project Technical Staff',
       'Regional Director'
     ]
   },

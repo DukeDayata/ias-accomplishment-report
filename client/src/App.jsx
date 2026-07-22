@@ -46,7 +46,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           
           <Route path="accomplishments" element={
-            <ProtectedRoute allowedRoles={['Regional Director', 'Regional Administrator or IZN Focal Person', 'Regional Encoder or Project Technical Staff']}>
+            <ProtectedRoute allowedRoles={['Regional Director', 'Regional Administrator or IZN Focal Person', 'Project Technical Staff']}>
               <AccomplishmentsManager />
             </ProtectedRoute>
           } />

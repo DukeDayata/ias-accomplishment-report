@@ -172,13 +172,13 @@ const seedData = async () => {
         regionId: ncrRegion._id
       });
       
-      // Create a Regional Encoder for testing
+      // Create a Project Technical Staff for testing
       await User.create({
         firstName: 'Encoder',
         lastName: 'Staff',
         email: 'ncr.encoder@ched.gov.ph',
         password: 'password123',
-        role: 'Regional Encoder or Project Technical Staff',
+        role: 'Project Technical Staff',
         regionId: ncrRegion._id
       });
     }

@@ -10,15 +10,15 @@ export default {
       colors: {
         gov: {
           blue: {
-            DEFAULT: '#0038A8',
-            dark: '#002B80',
-            light: '#E6EEFF',
-            accent: '#0E59F2'
+            DEFAULT: '#0F4C81',
+            dark: '#0a3356',
+            light: '#e6f0f9',
+            accent: '#1a68b0'
           },
           gold: {
-            DEFAULT: '#FFC72C',
-            dark: '#D99B00',
-            light: '#FEF9E7'
+            DEFAULT: '#E5A726',
+            dark: '#b8861e',
+            light: '#fcf6e9'
           },
           red: {
             DEFAULT: '#D22630',
@@ -38,11 +38,33 @@ export default {
         surface: {
           bg: '#F8FAFC',
           card: '#FFFFFF',
+        },
+        accent: {
+          emerald: '#10B981',
+          violet: '#8B5CF6',
+          indigo: '#6366F1',
+          rose: '#F43F5E',
+          cyan: '#06B6D4'
         }
       },
       fontFamily: {
         sans: ['Inter', 'Arial', 'sans-serif'],
       },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 3s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(15px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        }
+      }
     },
   },
   plugins: [],

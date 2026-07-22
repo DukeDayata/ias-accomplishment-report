@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
       password,
       firstName,
       lastName,
-      role: role || 'Regional Encoder or Project Technical Staff',
+      role: role || 'Project Technical Staff',
       regionId,
       position,
       contactNumber
