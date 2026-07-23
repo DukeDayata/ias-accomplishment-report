@@ -309,11 +309,11 @@ export default function UserManagement() {
                 </select>
               </div>
 
-              {formData.role.includes('Regional') && (
+              {!formData.role.startsWith('IAS') && (
                 <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2">
                   <label className="text-xs font-semibold text-slate-700">Assigned Region</label>
                   <select 
-                    required={formData.role.includes('Regional')}
+                    required={!formData.role.startsWith('IAS')}
                     value={formData.regionId}
                     onChange={(e) => setFormData({...formData, regionId: e.target.value})}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:outline-none focus:border-gov-blue"

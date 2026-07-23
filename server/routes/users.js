@@ -59,7 +59,12 @@ router.put('/:id', protect, authorize('IAS Super Administrator'), async (req, re
     user.lastName = lastName || user.lastName;
     user.email = email || user.email;
     user.role = role || user.role;
-    user.regionId = regionId || user.regionId;
+    
+    if (user.role.startsWith('IAS')) {
+      user.regionId = null;
+    } else if (regionId !== undefined) {
+      user.regionId = regionId;
+    }
     
     if (password) {
       user.password = password;

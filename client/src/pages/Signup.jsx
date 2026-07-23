@@ -20,8 +20,8 @@ export default function Signup() {
     }
   });
 
-  const selectedRole = watch('role');
-  const isRegionalRole = selectedRole.startsWith('Regional');
+  const selectedRole = watch('role') || '';
+  const isRegionalRole = !selectedRole.startsWith('IAS');
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -41,7 +41,7 @@ export default function Signup() {
       setError('');
       
       // Clear region if it's an IAS role
-      if (!data.role.startsWith('Regional')) {
+      if (data.role.startsWith('IAS')) {
         delete data.regionId;
       }
       
