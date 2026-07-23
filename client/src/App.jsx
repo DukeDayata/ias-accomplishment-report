@@ -10,6 +10,8 @@ import Dashboard from './pages/Dashboard';
 import AccomplishmentsManager from './pages/Accomplishments';
 import ReportReview from './pages/Reports/ReportReview';
 import UserManagement from './pages/UserManagement';
+import AuditLogs from './pages/UserManagement/AuditLogs';
+import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children, allowedRoles }) {
@@ -61,6 +63,18 @@ function App() {
           <Route path="users" element={
             <ProtectedRoute allowedRoles={['IAS Super Administrator']}>
               <UserManagement />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="audit-logs" element={
+            <ProtectedRoute allowedRoles={['IAS Super Administrator', 'IAS Director', 'IAS Staff']}>
+              <AuditLogs />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="settings" element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           } />
           

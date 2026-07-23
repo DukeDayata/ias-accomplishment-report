@@ -3,6 +3,7 @@ const router = express.Router();
 const { protect } = require('../middleware/auth');
 const Report = require('../models/Report');
 const AccomplishmentEntry = require('../models/AccomplishmentEntry');
+const { logAction } = require('../utils/logger');
 
 // @route   GET /api/reports
 // @desc    Get reports
@@ -66,6 +67,8 @@ router.post('/', protect, async (req, res) => {
     const options = { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true };
     const savedReport = await Report.findOneAndUpdate(filter, update, options);
     
+    await logAction(req, 'UPSERT', 'Report', savedReport._id, null, savedReport);
+    
     res.status(201).json(savedReport);
   } catch (error) {
     console.error(error);
@@ -86,6 +89,7 @@ router.patch('/:id/status', protect, async (req, res) => {
     }
 
     // Auth checks based on new status and user role could be added here
+    const previousState = report.toObject();
     
     report.status = status;
     if (remarks) {
@@ -136,6 +140,8 @@ router.patch('/:id/status', protect, async (req, res) => {
       
       await AccomplishmentEntry.updateMany(filter, { $set: { status: status === 'Submitted to IAS' ? 'Submitted' : status } });
     }
+
+    await logAction(req, 'UPDATE_STATUS', 'Report', updatedReport._id, { status: previousState.status }, { status: updatedReport.status });
 
     res.json(updatedReport);
   } catch (error) {

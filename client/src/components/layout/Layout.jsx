@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  History,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import iasLogo from '../../assets/ias-logo.png';
@@ -32,6 +34,8 @@ export default function Layout() {
     { name: 'Accomplishments', path: '/accomplishments', icon: FileSpreadsheet, roles: ['Regional', 'Project'] },
     { name: 'Report Reviews', path: '/reviews', icon: ClipboardCheck, roles: ['IAS'] },
     { name: 'User Management', path: '/users', icon: Users, roles: ['IAS Super Administrator'] },
+    { name: 'Audit Logs', path: '/audit-logs', icon: History, roles: ['IAS'] },
+    { name: 'Settings', path: '/settings', icon: SettingsIcon, roles: ['IAS', 'Regional', 'Project'] },
   ];
 
   return (

@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { logAction } = require('../utils/logger');
 
 const router = express.Router();
 
@@ -34,6 +35,9 @@ router.post('/register', async (req, res) => {
     });
 
     if (user) {
+      req.user = user;
+      await logAction(req, 'CREATE', 'User', user._id, null, { email: user.email, role: user.role });
+      
       res.status(201).json({
         _id: user._id,
         firstName: user.firstName,
@@ -64,6 +68,9 @@ router.post('/login', async (req, res) => {
       // Update last login
       user.lastLogin = new Date();
       await user.save();
+
+      req.user = user;
+      await logAction(req, 'LOGIN', 'User', user._id, null, null);
 
       res.json({
         _id: user._id,

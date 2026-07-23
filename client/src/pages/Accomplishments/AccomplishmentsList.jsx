@@ -297,7 +297,7 @@ export default function AccomplishmentsList({ onSwitchView }) {
     <div className="flex flex-col h-full space-y-6 relative">
       
       {/* View Toggle (Top Right) */}
-      <div className="flex justify-end">
+      <div className="flex justify-end no-print">
         <div className="inline-flex bg-slate-100 p-1 rounded-lg">
           <button 
             className="px-4 py-1.5 text-sm font-semibold rounded-md bg-white shadow-sm text-brand-primary"
@@ -314,7 +314,7 @@ export default function AccomplishmentsList({ onSwitchView }) {
       </div>
 
       {/* Filter Bar */}
-      <div className="glass-card p-6 rounded-2xl mb-6">
+      <div className="glass-card p-6 rounded-2xl mb-6 no-print">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <Search className="text-gov-blue" size={20} />
@@ -389,8 +389,8 @@ export default function AccomplishmentsList({ onSwitchView }) {
             <h3 className="text-lg font-bold text-slate-800">Accomplishments List</h3>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Showing {filteredData.length} records</p>
           </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+          <div className="flex gap-3 no-print">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
               <Printer size={16} /> Print Report
             </button>
             <button onClick={handleExportXLS} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gov-blue rounded-lg hover:bg-gov-blue-dark transition-colors">
@@ -404,6 +404,7 @@ export default function AccomplishmentsList({ onSwitchView }) {
             <thead className="bg-slate-50/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Month</th>
+                <th className="px-6 py-4">Category</th>
                 <th className="px-6 py-4">Indicator</th>
                 <th className="px-6 py-4 text-center">Week</th>
                 <th className="px-6 py-4 text-right">Actual</th>
@@ -415,14 +416,14 @@ export default function AccomplishmentsList({ onSwitchView }) {
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gov-blue mx-auto mb-3"></div>
                     Loading records...
                   </td>
                 </tr>
               ) : filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500 italic">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-500 italic">
                     No accomplishments found for the selected filters.
                   </td>
                 </tr>
@@ -431,6 +432,10 @@ export default function AccomplishmentsList({ onSwitchView }) {
                   <tr key={acc._id} className="hover:bg-gov-blue-light/20 transition-colors hover:-translate-y-0.5 duration-300">
                     <td className="px-6 py-4 text-sm font-semibold text-slate-700">
                       {acc.reportType === 'activity' ? format(new Date(acc.startDate), 'MMM yyyy') : getMonthName(acc.monthIndex)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600 font-medium max-w-xs truncate" title={categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}>
+                      {categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || 
+                       (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}
                     </td>
                     <td className="px-6 py-4 text-sm text-gov-blue max-w-md">
                       <p className="font-medium line-clamp-2">

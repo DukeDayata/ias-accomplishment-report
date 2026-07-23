@@ -5,6 +5,7 @@ const AccomplishmentEntry = require('../models/AccomplishmentEntry');
 const Region = require('../models/Region');
 const Indicator = require('../models/Indicator');
 const Category = require('../models/Category');
+const { logAction } = require('../utils/logger');
 
 // @route   GET /api/accomplishments
 // @desc    Get accomplishments (with optional filters)
@@ -107,6 +108,9 @@ router.post('/', protect, async (req, res) => {
         },
         { upsert: true, returnDocument: 'after' }
       );
+      
+      await logAction(req, 'UPSERT', 'AccomplishmentEntry', updated._id, null, updated);
+      
       return res.status(201).json({ message: 'Accomplishment saved successfully', entry: updated });
 
     } else if (reportType === 'activity') {
@@ -124,6 +128,9 @@ router.post('/', protect, async (req, res) => {
         },
         { upsert: true, returnDocument: 'after' }
       );
+      
+      await logAction(req, 'UPSERT', 'AccomplishmentEntry', updated._id, null, updated);
+      
       return res.status(201).json({ message: 'Activity accomplishment saved successfully', entry: updated });
     } else {
       return res.status(400).json({ error: 'Invalid reportType' });
@@ -143,6 +150,8 @@ router.put('/:id', protect, async (req, res) => {
     let entry = await AccomplishmentEntry.findById(req.params.id);
     
     if (!entry) return res.status(404).json({ error: 'Entry not found' });
+    
+    const previousState = entry.toObject();
     
     // Auth check
     if (req.user.role.startsWith('Regional') && entry.regionId.toString() !== req.user.regionId?.toString()) {
@@ -174,6 +183,9 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     const updatedEntry = await entry.save();
+    
+    await logAction(req, 'UPDATE', 'AccomplishmentEntry', updatedEntry._id, previousState, updatedEntry);
+    
     res.json(updatedEntry);
   } catch (error) {
     console.error(error);
@@ -193,8 +205,13 @@ router.delete('/:id', protect, async (req, res) => {
     if (req.user.role.startsWith('Regional') && entry.regionId.toString() !== req.user.regionId?.toString()) {
       return res.status(403).json({ error: 'Not authorized' });
     }
+    
+    const previousState = entry.toObject();
 
     await entry.deleteOne();
+    
+    await logAction(req, 'DELETE', 'AccomplishmentEntry', entry._id, previousState, null);
+    
     res.json({ message: 'Entry removed' });
   } catch (error) {
     console.error(error);

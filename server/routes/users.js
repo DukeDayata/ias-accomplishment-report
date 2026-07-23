@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { protect, authorize } = require('../middleware/auth');
-// Note: logger utility omitted for now to keep things simple unless strictly requested.
+const { logAction } = require('../utils/logger');
 
 // Get all users
 router.get('/', protect, authorize('IAS Super Administrator'), async (req, res) => {
@@ -38,10 +38,54 @@ router.post('/', protect, authorize('IAS Super Administrator'), async (req, res)
       createdAt: saved.createdAt
     };
     
+    await logAction(req, 'CREATE', 'User', saved._id, null, userResponse);
+    
     res.status(201).json(userResponse);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error creating user' });
+  }
+});
+
+// Update own profile
+router.put('/profile', protect, async (req, res) => {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+    
+    const user = await User.findById(req.user.id || req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const previousState = user.toObject();
+
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (email) user.email = email;
+    if (password) user.password = password;
+
+    const updated = await user.save();
+    
+    const userResponse = {
+      _id: updated._id,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      email: updated.email,
+      role: updated.role,
+      regionId: updated.regionId,
+      createdAt: updated.createdAt
+    };
+    
+    await logAction(req, 'UPDATE', 'User', updated._id, {
+      firstName: previousState.firstName,
+      lastName: previousState.lastName,
+      email: previousState.email
+    }, userResponse);
+
+    res.json(userResponse);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error updating profile' });
   }
 });
 
@@ -54,6 +98,8 @@ router.put('/:id', protect, authorize('IAS Super Administrator'), async (req, re
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+    
+    const previousState = user.toObject();
 
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;
@@ -81,6 +127,14 @@ router.put('/:id', protect, authorize('IAS Super Administrator'), async (req, re
       regionId: updated.regionId,
       createdAt: updated.createdAt
     };
+    
+    await logAction(req, 'UPDATE', 'User', updated._id, {
+      firstName: previousState.firstName,
+      lastName: previousState.lastName,
+      email: previousState.email,
+      role: previousState.role,
+      regionId: previousState.regionId
+    }, userResponse);
 
     res.json(userResponse);
   } catch (error) {
@@ -94,6 +148,13 @@ router.delete('/:id', protect, authorize('IAS Super Administrator'), async (req,
   try {
     const deleted = await User.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: 'User not found' });
+    
+    await logAction(req, 'DELETE', 'User', deleted._id, {
+      firstName: deleted.firstName,
+      lastName: deleted.lastName,
+      email: deleted.email,
+      role: deleted.role
+    }, null);
     
     res.json({ message: 'User deleted' });
   } catch (error) {
