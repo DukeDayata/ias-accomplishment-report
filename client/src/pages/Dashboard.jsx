@@ -69,7 +69,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   const currentYear = new Date().getFullYear();
-  
+
   // Standard brand color palette for charts
   const COLORS = ['#0F4C81', '#E5A726', '#D22630', '#0a3356', '#1a68b0', '#b8861e', '#15803D', '#D97706'];
   const isAdmin = user?.role?.startsWith('IAS');
@@ -190,9 +190,8 @@ export default function Dashboard() {
         if (iId && indMap[iId]) indMap[iId].value += (item.actual || 0);
       });
       const topIndicators = Object.values(indMap)
-        .filter(i => i.value > 0)
         .sort((a, b) => b.value - a.value)
-        .slice(0, 5);
+        .slice(0, 7);
 
       const totalTarget = indicators.reduce((sum, ind) => sum + (ind.annualTarget || 100), 0);
 
@@ -233,13 +232,13 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 pb-12 overflow-x-hidden">
-      
+
       {/* Dynamic Hero Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-gov-blue-dark via-gov-blue to-gov-blue-accent p-8 md:p-10 text-white premium-shadow animate-fade-in-up">
         {/* Decorative Floating Elements */}
         <div className="absolute -top-12 -right-12 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-0 left-20 w-40 h-40 bg-gov-gold opacity-20 rounded-full blur-2xl"></div>
-        
+
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h2 className="text-3xl md:text-4xl font-black mb-2 tracking-tight text-white flex items-center gap-3">
@@ -274,7 +273,7 @@ export default function Dashboard() {
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* KPI 1: Total Accomplishments */}
         <div className="glass-card p-6 rounded-3xl flex flex-col justify-center hover:-translate-y-1 transition-all duration-300 premium-shadow relative overflow-hidden group animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="absolute -right-6 -top-6 text-gov-blue-light/30 opacity-50 group-hover:scale-110 transition-transform duration-500">
@@ -312,14 +311,14 @@ export default function Dashboard() {
                 <p className="text-sm font-bold text-slate-400 mt-1">of {stats.totalTarget.toLocaleString()} Target</p>
               </div>
             </div>
-            
+
             <div className="flex-shrink-0 mt-2">
-               <ProgressRing 
-                 radius={50} 
-                 stroke={10} 
-                 progress={progressPercentage} 
-                 colorClass="text-purple-600" 
-               />
+              <ProgressRing
+                radius={50}
+                stroke={10}
+                progress={progressPercentage}
+                colorClass="text-purple-600"
+              />
             </div>
           </div>
         </div>
@@ -346,7 +345,7 @@ export default function Dashboard() {
       {isAdmin && adminSelectedRegion === 'All' && (
         <div className="glass-card p-6 rounded-3xl premium-shadow animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <h3 className="text-base font-black text-slate-800 mb-6 flex items-center gap-3">
-            <div className="bg-gov-blue-light/60 p-2 rounded-lg text-gov-blue"><FileSpreadsheet size={18} /></div> 
+            <div className="bg-gov-blue-light/60 p-2 rounded-lg text-gov-blue"><FileSpreadsheet size={18} /></div>
             Regional Submission Compliance (Q1-Q4)
           </h3>
           <div className="overflow-x-auto rounded-2xl border border-slate-100">
@@ -381,17 +380,17 @@ export default function Dashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
         {/* Trend Chart */}
         <div className="glass-card p-6 rounded-3xl premium-shadow relative animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
           {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
-              <div className="bg-gov-blue-light/60 p-2 rounded-lg text-gov-blue"><Activity size={18} /></div> 
+              <div className="bg-gov-blue-light/60 p-2 rounded-lg text-gov-blue"><Activity size={18} /></div>
               Accomplishments Trend ({currentYear})
             </h3>
           </div>
-          <div className="h-[320px] w-full">
+          <div className="h-[450px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.trend} margin={{ top: 5, right: 20, bottom: 5, left: -20 }}>
                 <defs>
@@ -421,16 +420,16 @@ export default function Dashboard() {
             {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
-                <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><FileText size={18} /></div> 
-                Top 5 Performing Indicators
+                <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><FileText size={18} /></div>
+                Performing Indicators
               </h3>
             </div>
-            <div className="h-[320px]">
+            <div className="h-[450px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.topIndicators} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={24}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 600 }} />
-                  <YAxis dataKey="name" type="category" width={160} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 700 }} />
+                  <YAxis dataKey="name" type="category" width={240} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 700 }} />
                   <Tooltip
                     cursor={{ fill: '#F8FAFC' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255, 255, 255, 0.98)', padding: '12px 16px' }}
@@ -450,16 +449,16 @@ export default function Dashboard() {
             {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
-                <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><LayoutGrid size={18} /></div> 
+                <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><LayoutGrid size={18} /></div>
                 Accomplishments by Category
               </h3>
             </div>
-            <div className="h-[320px]">
+            <div className="h-[450px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.byCategory} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={24}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 600 }} />
-                  <YAxis dataKey="name" type="category" width={160} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 700 }} />
+                  <YAxis dataKey="name" type="category" width={240} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 700 }} />
                   <Tooltip
                     cursor={{ fill: '#F8FAFC' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255, 255, 255, 0.98)', padding: '12px 16px' }}
@@ -477,15 +476,88 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* Additional Admin Charts */}
+      {isAdmin && adminSelectedRegion === 'All' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          
+          {/* Regional Performance */}
+          <div className="glass-card p-6 rounded-3xl premium-shadow relative animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
+                <div className="bg-gov-blue-light/60 p-2 rounded-lg text-gov-blue"><Target size={18} /></div> 
+                Regional Performance Comparison
+              </h3>
+            </div>
+            <div className="h-[500px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.byRegion} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }} barSize={16}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 600 }} />
+                  <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} tick={{ fill: '#475569', fontSize: 11, fontWeight: 700 }} />
+                  <Tooltip
+                    cursor={{ fill: '#F8FAFC' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255, 255, 255, 0.98)', padding: '12px 16px' }}
+                    itemStyle={{ color: '#0F172A', fontWeight: '900', fontSize: '14px' }}
+                  />
+                  <Bar dataKey="value" name="Accomplishments" radius={[0, 6, 6, 0]}>
+                    {stats.byRegion.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Category Distribution Donut */}
+          <div className="glass-card p-6 rounded-3xl premium-shadow relative animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
+            {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
+                <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><LayoutGrid size={18} /></div> 
+                Category Distribution
+              </h3>
+            </div>
+            <div className="h-[500px] flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats.byCategory}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={110}
+                    outerRadius={160}
+                    paddingAngle={3}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {stats.byCategory.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255, 255, 255, 0.98)', padding: '12px 16px' }}
+                    itemStyle={{ color: '#0F172A', fontWeight: '900', fontSize: '14px' }}
+                  />
+                  <Legend verticalAlign="bottom" height={40} iconType="circle" wrapperStyle={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}/>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+        </div>
+      )}
+
       {/* Bottom Section: Feed / Lists */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
-        
+
         {/* Category 7 Activities Feed */}
         <div className="glass-card p-6 rounded-3xl relative flex flex-col premium-shadow animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
           {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
-              <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><FileText size={18} /></div> 
+              <div className="bg-gov-gold/20 p-2 rounded-lg text-gov-gold-dark"><FileText size={18} /></div>
               Category 7 Highlights
             </h3>
           </div>
@@ -524,7 +596,7 @@ export default function Dashboard() {
           {isLoading && <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 rounded-3xl"></div>}
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <h3 className="text-base font-black text-slate-800 flex items-center gap-3">
-              <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><Clock size={18} /></div> 
+              <div className="bg-purple-100 p-2 rounded-lg text-purple-600"><Clock size={18} /></div>
               Live Submissions Feed
             </h3>
           </div>
@@ -538,7 +610,7 @@ export default function Dashboard() {
                       {isAdmin ? sub.regionName : `Week ${sub.weekNumber || '-'}`}
                     </span>
                     <span className="text-[11px] text-slate-400 font-bold flex items-center gap-1">
-                       {sub.date}
+                      {sub.date}
                     </span>
                   </div>
                   <p className="text-sm font-black text-slate-800 line-clamp-2 leading-snug mt-2 group-hover:text-purple-700 transition-colors">
