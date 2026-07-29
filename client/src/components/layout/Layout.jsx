@@ -138,7 +138,7 @@ export default function Layout() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-dashboard-bg">
         {/* Top Navbar */}
-        <header className="h-16 bg-white/90 backdrop-blur-sm border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-30 sticky top-0 no-print transition-all duration-300">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-30 sticky top-0 no-print shadow-sm transition-all duration-300">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}

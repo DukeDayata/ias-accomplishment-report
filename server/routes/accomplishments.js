@@ -29,6 +29,7 @@ router.get('/', protect, async (req, res) => {
 
     const accomplishments = await AccomplishmentEntry.find(query)
       .populate('indicatorId')
+      .populate('categoryId')
       .populate('enteredBy', 'firstName lastName')
       .sort({ createdAt: -1 });
 
