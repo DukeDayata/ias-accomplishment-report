@@ -77,17 +77,17 @@ export default function Dashboard() {
   const currentYear = new Date().getFullYear();
 
   const CATEGORY_COLORS = {
-    'CAT-1': { main: '#0038A8', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-    'CAT-2': { main: '#0EA5E9', bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
-    'CAT-3': { main: '#8B5CF6', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-    'CAT-4': { main: '#D97706', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-    'CAT-5': { main: '#10B981', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-    'CAT-6': { main: '#E11D48', bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
-    'CAT-7': { main: '#4F46E5', bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' }
+    'CAT-1': { main: '#155a8e', bg: 'bg-[#155a8e]/10', text: 'text-[#155a8e]', border: 'border-[#155a8e]/30' },
+    'CAT-2': { main: '#508d98', bg: 'bg-[#508d98]/10', text: 'text-[#508d98]', border: 'border-[#508d98]/30' },
+    'CAT-3': { main: '#b16223', bg: 'bg-[#b16223]/10', text: 'text-[#b16223]', border: 'border-[#b16223]/30' },
+    'CAT-4': { main: '#3c7816', bg: 'bg-[#3c7816]/10', text: 'text-[#3c7816]', border: 'border-[#3c7816]/30' },
+    'CAT-5': { main: '#e712f2', bg: 'bg-[#e712f2]/10', text: 'text-[#e712f2]', border: 'border-[#e712f2]/30' },
+    'CAT-6': { main: '#291753', bg: 'bg-[#291753]/10', text: 'text-[#291753]', border: 'border-[#291753]/30' },
+    'CAT-7': { main: '#0F4C81', bg: 'bg-[#0F4C81]/10', text: 'text-[#0F4C81]', border: 'border-[#0F4C81]/30' }
   };
 
-  // Standard brand color palette for charts
-  const COLORS = ['#0F4C81', '#E5A726', '#D22630', '#0a3356', '#1a68b0', '#b8861e', '#15803D', '#D97706'];
+  // Standard brand color palette for charts matching 7 official categories
+  const COLORS = ['#155a8e', '#508d98', '#b16223', '#3c7816', '#e712f2', '#291753', '#0F4C81'];
   const isAdmin = user?.role?.startsWith('IAS');
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function Dashboard() {
       const totalAccomplishments = data.reduce((sum, item) => sum + (item.actual || 0), 0);
 
       const catMap = {};
-      categories.forEach(c => catMap[String(c._id)] = { name: c.categoryName, value: 0 });
+      categories.forEach(c => catMap[String(c._id)] = { name: c.categoryName, code: c.categoryCode, value: 0 });
       data.forEach(item => {
         let catId = item.categoryId?._id || item.categoryId || item.indicatorId?.categoryId?._id || item.indicatorId?.categoryId;
         if (catId) {
@@ -552,7 +552,7 @@ export default function Dashboard() {
                   />
                   <Bar dataKey="value" name="Accomplishments" radius={[0, 6, 6, 0]}>
                     {stats.byCategory.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.code]?.main || COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -622,7 +622,7 @@ export default function Dashboard() {
                       stroke="none"
                     >
                       {stats.byCategory.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[(index + 4) % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[entry.code]?.main || COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip 
@@ -634,12 +634,14 @@ export default function Dashboard() {
                       content={({ payload }) => (
                         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 mt-3 px-1 text-xs font-bold text-slate-600">
                           {payload?.map((entry, index) => {
+                            const catObj = stats.byCategory[index];
+                            const color = CATEGORY_COLORS[catObj?.code]?.main || entry.color;
                             const name = entry.value === 'Other Internationalization Activities and Accomplishments'
                               ? 'Other Internationalization Activities'
                               : entry.value;
                             return (
                               <div key={`donut-item-${index}`} className="flex items-center gap-1.5 min-w-0">
-                                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }}></span>
+                                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }}></span>
                                 <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 leading-tight truncate max-w-[160px] sm:max-w-none">{name}</span>
                               </div>
                             );
