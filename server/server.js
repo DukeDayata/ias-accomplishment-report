@@ -24,6 +24,7 @@ app.use('/api/reports', require('./routes/reports'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/auditlogs', require('./routes/auditLogs'));
+app.use('/api/public/analytics', require('./routes/publicAnalytics'));
 
 // Serve uploads statically
 const path = require('path');
