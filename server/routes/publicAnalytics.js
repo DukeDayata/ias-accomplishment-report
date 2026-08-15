@@ -19,6 +19,33 @@ const setCacheHeaders = (res, maxAge = 60) => {
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// @route   GET /api/public/analytics
+// @desc    API Directory listing all available public analytics endpoints
+// @access  Public
+router.get('/', (req, res) => {
+  setCacheHeaders(res);
+  const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+  res.json({
+    status: 'success',
+    title: 'CHED IAS Public Analytics API Index',
+    meta: {
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    },
+    singleSnapshotDataEndpoint: `${baseUrl}/export`,
+    availableEndpoints: [
+      { name: 'Summary KPIs', path: '/summary', url: `${baseUrl}/summary`, method: 'GET', description: 'Aggregated KPI stats (total accomplishments, target, completion rate, YoY growth)' },
+      { name: 'Regional Performance & Rankings', path: '/regions', url: `${baseUrl}/regions`, method: 'GET', description: 'Performance statistics and rankings across all 17 CHED regions' },
+      { name: 'Category Breakdown', path: '/categories', url: `${baseUrl}/categories`, method: 'GET', description: 'Aggregated totals and indicator metrics per IAS category (CAT-1 to CAT-7)' },
+      { name: 'Time-series Trends', path: '/trends', url: `${baseUrl}/trends`, method: 'GET', description: 'Monthly and quarterly accomplishment time-series trend data' },
+      { name: 'Indicator Breakdown', path: '/indicators', url: `${baseUrl}/indicators`, method: 'GET', description: 'Accomplishment performance totals and targets per indicator' },
+      { name: 'Regional Category Matrix', path: '/matrix', url: `${baseUrl}/matrix`, method: 'GET', description: '17-Region × 7-Category cross-tabulation accomplishment matrix' },
+      { name: 'Public Activities Log', path: '/activities', url: `${baseUrl}/activities`, method: 'GET', description: 'Paginated public log of Category 7 activities and special initiatives' },
+      { name: 'Complete Snapshot Export', path: '/export', url: `${baseUrl}/export`, method: 'GET', description: 'Complete open-data analytics snapshot payload in JSON' }
+    ]
+  });
+});
+
 // @route   GET /api/public/analytics/summary
 // @desc    Get high-level aggregated KPI statistics
 // @access  Public

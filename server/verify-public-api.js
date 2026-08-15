@@ -41,6 +41,7 @@ async function startAndTest() {
     console.log(`Test server running on port ${PORT}\n`);
 
     const endpoints = [
+      '',
       '/summary',
       '/regions',
       '/categories',

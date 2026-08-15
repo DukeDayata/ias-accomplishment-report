@@ -23,6 +23,7 @@ GET http://localhost:5000/api/public/analytics
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
+| [`/`](#0-api-index) | `GET` | **API Directory Index** listing all available public endpoints with direct links |
 | [`/summary`](#1-summary) | `GET` | Aggregated KPI stats (accomplishments, targets, completion rate, YoY growth) |
 | [`/regions`](#2-regions) | `GET` | Performance statistics and rankings across all 17 CHED regions |
 | [`/categories`](#3-categories) | `GET` | Aggregated totals and indicator metrics per IAS category (CAT-1 to CAT-7) |
@@ -30,7 +31,7 @@ GET http://localhost:5000/api/public/analytics
 | [`/indicators`](#5-indicators) | `GET` | Accomplishment performance totals and targets per indicator |
 | [`/matrix`](#6-matrix) | `GET` | 17-Region × 7-Category cross-tabulation accomplishment matrix |
 | [`/activities`](#7-activities) | `GET` | Paginated public log of Category 7 activities and special initiatives |
-| [`/export`](#8-export) | `GET` | Complete open-data analytics snapshot payload in JSON |
+| [`/export`](#8-export) | `GET` | **Complete Snapshot Export** — All open-data metrics in a single payload |
 
 ---
 
