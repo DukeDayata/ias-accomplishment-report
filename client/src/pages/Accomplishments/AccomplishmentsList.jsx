@@ -90,6 +90,18 @@ export default function AccomplishmentsList({ onSwitchView }) {
     return months[monthIdx] || '-';
   };
 
+  const getCategoryName = (acc) => {
+    if (acc?.categoryId?.categoryName) return acc.categoryId.categoryName;
+    const catId = (typeof acc?.categoryId === 'object' ? acc.categoryId?._id : acc?.categoryId) ||
+                  (typeof acc?.indicatorId?.categoryId === 'object' ? acc.indicatorId.categoryId?._id : acc?.indicatorId?.categoryId);
+    if (catId) {
+      const found = categories.find(c => String(c._id) === String(catId));
+      if (found) return found.categoryName;
+    }
+    if (acc?.indicatorId?.categoryId?.categoryName) return acc.indicatorId.categoryId.categoryName;
+    return '-';
+  };
+
   // Filter logic
   const filteredData = accomplishments.filter(acc => {
     const sQuery = (searchQuery || '').toLowerCase();
@@ -107,7 +119,8 @@ export default function AccomplishmentsList({ onSwitchView }) {
     const matchesMonth = selectedMonth === 'All Months' || getMonthName(accMonth) === selectedMonth;
     
     // Category match requires us to know the category of the indicator
-    const catId = acc.categoryId || (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?._id : acc.indicatorId?.categoryId);
+    const catId = (typeof acc.categoryId === 'object' ? acc.categoryId?._id : acc.categoryId) || 
+                  (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?._id : acc.indicatorId?.categoryId);
     const matchesCat = selectedCategory === 'All Categories' || String(catId) === String(selectedCategory);
 
     return matchesSearch && matchesQuarter && matchesMonth && matchesCat;
@@ -190,7 +203,8 @@ export default function AccomplishmentsList({ onSwitchView }) {
     setEditTargetId(acc._id);
     
     setFormData({
-      categoryId: acc.categoryId || acc.indicatorId?.categoryId || '',
+      categoryId: (typeof acc.categoryId === 'object' ? acc.categoryId?._id : acc.categoryId) || 
+                  (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?._id : acc.indicatorId?.categoryId) || '',
       indicatorId: acc.indicatorId?._id || '',
       customIndicatorName: '',
       activityTitle: acc.activityTitle || '',
@@ -266,8 +280,7 @@ export default function AccomplishmentsList({ onSwitchView }) {
         accMonth = new Date(acc.startDate).getMonth();
       }
       
-      const categoryName = categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || 
-                           (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-');
+      const categoryName = getCategoryName(acc);
 
       return {
         'Category': categoryName,
@@ -433,9 +446,8 @@ export default function AccomplishmentsList({ onSwitchView }) {
                     <td className="px-6 py-4 text-sm font-semibold text-slate-700">
                       {acc.reportType === 'activity' ? format(new Date(acc.startDate), 'MMM yyyy') : getMonthName(acc.monthIndex)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 font-medium max-w-xs truncate" title={categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}>
-                      {categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || 
-                       (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}
+                    <td className="px-6 py-4 text-sm text-slate-600 font-medium max-w-xs truncate" title={getCategoryName(acc)}>
+                      {getCategoryName(acc)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gov-blue max-w-md">
                       <p className="font-medium line-clamp-2">

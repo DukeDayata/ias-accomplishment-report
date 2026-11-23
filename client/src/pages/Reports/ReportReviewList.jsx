@@ -56,6 +56,18 @@ export default function ReportReviewList({ onSwitchView }) {
     return months[monthIdx] || '-';
   };
 
+  const getCategoryName = (acc) => {
+    if (acc?.categoryId?.categoryName) return acc.categoryId.categoryName;
+    const catId = (typeof acc?.categoryId === 'object' ? acc.categoryId?._id : acc?.categoryId) ||
+                  (typeof acc?.indicatorId?.categoryId === 'object' ? acc.indicatorId.categoryId?._id : acc?.indicatorId?.categoryId);
+    if (catId) {
+      const found = categories.find(c => String(c._id) === String(catId));
+      if (found) return found.categoryName;
+    }
+    if (acc?.indicatorId?.categoryId?.categoryName) return acc.indicatorId.categoryId.categoryName;
+    return '-';
+  };
+
   // Filter logic
   const filteredData = accomplishments.filter(acc => {
     const sQuery = (searchQuery || '').toLowerCase();
@@ -73,7 +85,8 @@ export default function ReportReviewList({ onSwitchView }) {
     const matchesQuarter = selectedQuarter === 'All Quarters' || `Q${q}` === selectedQuarter;
     const matchesMonth = selectedMonth === 'All Months' || getMonthName(mIdx) === selectedMonth;
     
-    const catId = acc.categoryId || (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?._id : acc.indicatorId?.categoryId);
+    const catId = (typeof acc.categoryId === 'object' ? acc.categoryId?._id : acc.categoryId) || 
+                  (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?._id : acc.indicatorId?.categoryId);
     const matchesCat = selectedCategory === 'All Categories' || String(catId) === String(selectedCategory);
     
     const regId = typeof acc.regionId === 'object' ? acc.regionId?._id : acc.regionId;
@@ -95,8 +108,7 @@ export default function ReportReviewList({ onSwitchView }) {
         accMonth = new Date(acc.startDate).getMonth();
       }
       
-      const categoryName = categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || 
-                           (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-');
+      const categoryName = getCategoryName(acc);
       
       const regionName = regions.find(r => r._id === acc.regionId)?.regionName || '-';
 
@@ -268,8 +280,9 @@ export default function ReportReviewList({ onSwitchView }) {
                 </tr>
               ) : (
                 filteredData.map(acc => {
-                  const regionObj = regions.find(r => r._id === acc.regionId);
-                  const regionName = regionObj ? regionObj.regionName : 'Unknown Region';
+                  const rId = typeof acc.regionId === 'object' ? acc.regionId?._id : acc.regionId;
+                  const regionObj = regions.find(r => String(r._id) === String(rId));
+                  const regionName = regionObj ? regionObj.regionName : (acc.regionId?.regionName || 'Unknown Region');
                   
                   return (
                     <tr key={acc._id} className="hover:bg-gov-blue-light/20 transition-colors hover:-translate-y-0.5 duration-300">
@@ -279,9 +292,8 @@ export default function ReportReviewList({ onSwitchView }) {
                       <td className="px-6 py-4 text-sm font-semibold text-slate-700">
                         {getMonthName(acc.reportType === 'activity' && acc.startDate ? new Date(acc.startDate).getMonth() : acc.monthIndex)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600 font-medium max-w-xs truncate" title={categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}>
-                        {categories.find(c => String(c._id) === String(acc.categoryId))?.categoryName || 
-                         (typeof acc.indicatorId?.categoryId === 'object' ? acc.indicatorId?.categoryId?.categoryName : '-')}
+                      <td className="px-6 py-4 text-sm text-slate-600 font-medium max-w-xs truncate" title={getCategoryName(acc)}>
+                        {getCategoryName(acc)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gov-blue max-w-md">
                         <p className="font-medium line-clamp-2">

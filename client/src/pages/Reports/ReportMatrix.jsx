@@ -80,15 +80,17 @@ export default function ReportMatrix({ onSwitchView }) {
       accRes.data.forEach(acc => {
         if (acc.reportType === 'activity') {
           acts.push(acc);
-        } else {
-          if (!accMap[acc.indicatorId._id]) {
-            accMap[acc.indicatorId._id] = {};
+        } else if (acc.indicatorId) {
+          const indId = typeof acc.indicatorId === 'object' ? acc.indicatorId._id : acc.indicatorId;
+          if (!indId) return;
+          if (!accMap[indId]) {
+            accMap[indId] = {};
           }
           const key = `${acc.monthIndex}-${acc.weekNumber}`;
-          if (!accMap[acc.indicatorId._id][key]) {
-              accMap[acc.indicatorId._id][key] = 0;
+          if (!accMap[indId][key]) {
+            accMap[indId][key] = 0;
           }
-          accMap[acc.indicatorId._id][key] += acc.actual || 0;
+          accMap[indId][key] += acc.actual || 0;
         }
       });
       setAccomplishments(accMap);

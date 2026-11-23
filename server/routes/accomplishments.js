@@ -28,8 +28,12 @@ router.get('/', protect, async (req, res) => {
     if (status) query.status = status;
 
     const accomplishments = await AccomplishmentEntry.find(query)
-      .populate('indicatorId')
+      .populate({
+        path: 'indicatorId',
+        populate: { path: 'categoryId' }
+      })
       .populate('categoryId')
+      .populate('regionId')
       .populate('enteredBy', 'firstName lastName')
       .sort({ createdAt: -1 });
 
